@@ -37,9 +37,10 @@ trigger:
 
 steps:
   - name: clone-deps
-    image: docker:git
-    commands:
-      - git clone --single-branch --branch master https://github.com/dktunited/ru-kubernetes.git
+    image: plugins/drone-git
+    settings:
+      DRONE_REMOTE_URL: https://github.com/dktunited/ru-kubernetes.git
+      DRONE_COMMIT_BRANCH: master
 
   - name: deploy
     image: cr.yandex/crpddgo40bv7rqr6iin4/k8s-kubectl:latest
