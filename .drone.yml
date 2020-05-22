@@ -73,8 +73,6 @@ steps:
         from_secret: MONGO_DB_PASSWORD
       MONGO_URI:
         from_secret: MONGO_URI
-      LOGIN_DISABLED:
-        from_secret: LOGIN_DISABLED
       FLASK_APP:
         from_secret: FLASK_APP
       FLASK_ENV:
@@ -87,7 +85,7 @@ steps:
       - kubectl config set-credentials ci --token=$K8S_CI_TOKEN
       - kubectl config set-context ci --cluster=k8s --user=ci
       - kubectl config use-context ci
-      - helm template --name=$APP_NAME --namespace=$NS_NAME --set=ci.buildLogs=$DRONE_BUILD_LINK --set=ci.commitAuthor=$DRONE_COMMIT_AUTHOR_EMAIL --set=ci.gitName=$DRONE_REPO_NAME --set=appConfig.appVersion=$DRONE_BUILD_NUMBER --set=secret.SECRET_KEY=$SECRET_KEY --set=secret.GITHUB_TOKEN=$GITHUB_TOKEN --set=secret.DECATHLON_CLIENT_ID=$DECATHLON_CLIENT_ID --set=secret.DECATHLON_CLIENT_SECRET=$DECATHLON_CLIENT_SECRET --set=secret.DECATHLON_REDIRECT_URI=$DECATHLON_REDIRECT_URI --set=secret.DECATHLON_AUTHORIZATION_URL=$DECATHLON_AUTHORIZATION_URL --set=secret.DECATHLON_ACCESS_TOKEN_URL=$DECATHLON_ACCESS_TOKEN_URL --set=secret.MONGO_DB_USER=$MONGO_DB_USER --set=secret.MONGO_DB_PASSWORD=$MONGO_DB_PASSWORD --set=secret.MONGO_URI=$MONGO_URI --set=secret.LOGIN_DISABLED=$LOGIN_DISABLED $([[ -f values-app.yaml ]] && echo -f values-app.yaml) ru-kubernetes/cloud/$APP_NAME/ > deployment-$DRONE_BUILD_NUMBER.yaml
+      - helm template --name=$APP_NAME --namespace=$NS_NAME --set=ci.buildLogs=$DRONE_BUILD_LINK --set=ci.commitAuthor=$DRONE_COMMIT_AUTHOR_EMAIL --set=ci.gitName=$DRONE_REPO_NAME --set=appConfig.appVersion=$DRONE_BUILD_NUMBER --set=secret.SECRET_KEY=$SECRET_KEY --set=secret.GITHUB_TOKEN=$GITHUB_TOKEN --set=secret.DECATHLON_CLIENT_ID=$DECATHLON_CLIENT_ID --set=secret.DECATHLON_CLIENT_SECRET=$DECATHLON_CLIENT_SECRET --set=secret.DECATHLON_REDIRECT_URI=$DECATHLON_REDIRECT_URI --set=secret.DECATHLON_AUTHORIZATION_URL=$DECATHLON_AUTHORIZATION_URL --set=secret.DECATHLON_ACCESS_TOKEN_URL=$DECATHLON_ACCESS_TOKEN_URL --set=secret.MONGO_DB_USER=$MONGO_DB_USER --set=secret.MONGO_DB_PASSWORD=$MONGO_DB_PASSWORD --set=secret.MONGO_URI=$MONGO_URI $([[ -f values-app.yaml ]] && echo -f values-app.yaml) ru-kubernetes/cloud/$APP_NAME/ > deployment-$DRONE_BUILD_NUMBER.yaml
       - cat deployment-$DRONE_BUILD_NUMBER.yaml
       - kubectl apply -f deployment-$DRONE_BUILD_NUMBER.yaml
     when:
