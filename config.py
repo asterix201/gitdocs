@@ -22,4 +22,4 @@ class Config(object):
     DECATHLON_ACCESS_TOKEN_URL = os.environ.get('DECATHLON_ACCESS_TOKEN_URL')
     MONGO_URI = os.environ.get('MONGO_URI')
     SCHEDULER_API_ENABLED = True
-    LOGIN_DISABLED = os.environ.get('LOGIN_DISABLED')
+    LOGIN_DISABLED = False
