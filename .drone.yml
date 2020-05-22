@@ -89,8 +89,7 @@ steps:
       - kubectl config set-credentials ci --token=$K8S_CI_TOKEN
       - kubectl config set-context ci --cluster=k8s --user=ci
       - kubectl config use-context ci
-      - helm template \
-                      --name=$APP_NAME \
+      - helm template --name=$APP_NAME \
                       --namespace=$NS_NAME \
                       --set=ci.buildLogs=$DRONE_BUILD_LINK \
                       --set=ci.commitAuthor=$DRONE_COMMIT_AUTHOR_EMAIL \
