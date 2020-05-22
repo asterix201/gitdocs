@@ -1,0 +1,164 @@
+kind: pipeline
+name: build
+
+trigger:
+  branch:
+    - develop
+    - master
+  event:
+    - pull_request
+
+steps:
+  - name: build_container
+    image: plugins/docker
+    settings:
+      dockerfile: Dockerfile
+      registry: 
+        from_secret: CI_REGISTRY
+      username: 
+        from_secret: CI_REGISTRY_USER_SA
+      password: 
+        from_secret: CI_REGISTRY_PASSWORD_SA
+      repo: cr.yandex/crpddgo40bv7rqr6iin4/ru.decathlon.cloud/${DRONE_REPO_NAME}
+      tags: 
+        - ${DRONE_BUILD_NUMBER}
+        - ${DRONE_BRANCH%/*} 
+
+---
+kind: pipeline
+name: deploy
+
+trigger:
+  branch:
+    - develop
+    - master
+  event:
+    - push
+
+steps:
+  - name: clone-deps
+    image: docker:git
+    commands:
+      - git clone --single-branch --branch master https://github.com/dktunited/ru-kubernetes.git
+
+  - name: deploy
+    image: cr.yandex/crpddgo40bv7rqr6iin4/k8s-kubectl:latest
+    environment:
+      K8S_API_URL:
+        from_secret: K8S_API_URL
+        # from_secret: K8S_API_URL_${DRONE_BRANCH}
+      K8S_CI_TOKEN:
+        from_secret: K8S_CI_TOKEN
+        # from_secret: K8S_CI_TOKEN_${DRONE_BRANCH}
+      SECRET_KEY:
+        from_secret: SECRET_KEY
+      GITHUB_TOKEN:
+        from_secret: GITHUB_TOKEN
+      DECATHLON_CLIENT_ID:
+        from_secret: DECATHLON_CLIENT_ID
+      DECATHLON_CLIENT_SECRET:
+        from_secret: DECATHLON_CLIENT_SECRET
+      DECATHLON_REDIRECT_URI:
+        from_secret: DECATHLON_REDIRECT_URI
+      DECATHLON_SCOPE:
+        from_secret: DECATHLON_SCOPE
+      DECATHLON_AUTHORIZATION_URL:
+        from_secret: DECATHLON_AUTHORIZATION_URL
+      DECATHLON_ACCESS_TOKEN_URL:
+        from_secret: DECATHLON_ACCESS_TOKEN_URL
+      MONGO_DB_USER:
+        from_secret: MONGO_DB_USER
+      MONGO_DB_PASSWORD:
+        from_secret: MONGO_DB_PASSWORD
+      MONGO_URI:
+        from_secret: MONGO_URI
+      LOGIN_DISABLED:
+        from_secret: LOGIN_DISABLED
+      FLASK_APP:
+        from_secret: FLASK_APP
+      FLASK_ENV:
+        from_secret: FLASK_ENV
+    commands:
+      - APP_NAME=gitdocs
+      - echo $APP_NAME
+      - NS_NAME=cloud
+      - kubectl config set-cluster k8s --insecure-skip-tls-verify=true --server=$K8S_API_URL
+      - kubectl config set-credentials ci --token=$K8S_CI_TOKEN
+      - kubectl config set-context ci --cluster=k8s --user=ci
+      - kubectl config use-context ci
+      - helm template \
+                      --name=$APP_NAME \
+                      --namespace=$NS_NAME \
+                      --set=ci.buildLogs=$DRONE_BUILD_LINK \
+                      --set=ci.commitAuthor=$DRONE_COMMIT_AUTHOR_EMAIL \
+                      --set=ci.gitName=$DRONE_REPO_NAME \
+                      --set=appConfig.appVersion=$DRONE_BUILD_NUMBER \
+                      --set=secret.SECRET_KEY=$SECRET_KEY \
+                      --set=secret.GITHUB_TOKEN=$GITHUB_TOKEN \
+                      --set=secret.DECATHLON_CLIENT_ID=$DECATHLON_CLIENT_ID \
+                      --set=secret.DECATHLON_CLIENT_SECRET=$DECATHLON_CLIENT_SECRET \
+                      --set=secret.DECATHLON_REDIRECT_URI=$DECATHLON_REDIRECT_URI \
+                      --set=secret.DECATHLON_SCOPE=$DECATHLON_SCOPE \
+                      --set=secret.DECATHLON_AUTHORIZATION_URL=$DECATHLON_AUTHORIZATION_URL \
+                      --set=secret.DECATHLON_ACCESS_TOKEN_URL=$DECATHLON_ACCESS_TOKEN_URL \
+                      --set=secret.MONGO_DB_USER=$MONGO_DB_USER \
+                      --set=secret.MONGO_DB_PASSWORD=$MONGO_DB_PASSWORD \
+                      --set=secret.MONGO_URI=$MONGO_URI \
+                      --set=secret.LOGIN_DISABLED=$LOGIN_DISABLED \
+                      $([[ -f values-app.yaml ]] && echo -f values-app.yaml) \
+                      ru-kubernetes/cloud/$APP_NAME/ > deployment-$DRONE_BUILD_NUMBER.yaml
+      - cat deployment-$DRONE_BUILD_NUMBER.yaml
+      - kubectl apply -f deployment-$DRONE_BUILD_NUMBER.yaml
+    when:
+      event:
+        - push
+
+depends_on:
+  - build
+
+image_pull_secrets:
+  - dockerconfigjson
+
+---
+kind: secret
+name: CI_REGISTRY
+get:
+  path: ci/repository
+  name: CI_REGISTRY
+
+---
+kind: secret
+name: CI_REGISTRY_USER_SA
+get:
+  path: ci/repository
+  name: CI_REGISTRY_USER_SA
+
+---
+kind: secret
+name: CI_REGISTRY_PASSWORD_SA
+get:
+  path: ci/repository
+  name: CI_REGISTRY_PASSWORD_SA
+
+---
+kind: secret  
+name: K8S_API_URL
+get:
+  path: ci/ci-k8s
+  name: K8S_API_URL_develop
+  # name: K8S_API_URL_${DRONE_BRANCH%/*}
+
+---
+kind: secret  
+name: K8S_CI_TOKEN
+get:
+  path: ci/ci-k8s
+  name: K8S_CI_TOKEN_develop
+  # name: K8S_CI_TOKEN_${DRONE_BRANCH%/*}
+
+---
+kind: secret
+name: dockerconfigjson
+get:
+  path: ci/repository
+  name: dockerconfigjson
