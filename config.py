@@ -16,7 +16,8 @@ class Config(object):
     DECATHLON_CLIENT_ID = os.environ.get('DECATHLON_CLIENT_ID')
     DECATHLON_CLIENT_SECRET = os.environ.get('DECATHLON_CLIENT_SECRET')
     DECATHLON_REDIRECT_URI = os.environ.get('DECATHLON_REDIRECT_URI')
-    DECATHLON_SCOPE = os.environ.get('DECATHLON_SCOPE')
+    # DECATHLON_SCOPE = os.environ.get('DECATHLON_SCOPE')
+    DECATHLON_SCOPE = 'openid profile'
     DECATHLON_AUTHORIZATION_URL = os.environ.get('DECATHLON_AUTHORIZATION_URL')
     DECATHLON_ACCESS_TOKEN_URL = os.environ.get('DECATHLON_ACCESS_TOKEN_URL')
     MONGO_URI = os.environ.get('MONGO_URI')
