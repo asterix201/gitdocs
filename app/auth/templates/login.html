@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from 'bootstrap/utils.html' import render_flashed_messages %}
+
+
+{% block content %}
+      <div class="row align-self-center w-100">
+            <div class="container d-flex mx-auto flex-column align-items-center">
+                  <a href="{{ url_for('auth_bp.decathlon_login') }}" class="btn btn-lg btn-secondary">Decathlon Login</a>
+            </div>
+      </div>      
+
+{% endblock %}

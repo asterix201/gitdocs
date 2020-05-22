@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+
+{% block content %}
+<div class="col-md-3">
+  <ul class="nav flex-column nav-tabs bg-light">
+    {% for document in documents %}
+      <span id="document{{ document.id }}">
+        {{ render_nav_item('main_bp.get_document', document['name'], use_li=True, document_name=document['full_name']) }}
+      </span>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="col-md-9">
+  {% if document %}
+	<div class="row">
+		<div class="col-md-6 align-self-center">
+			<p class="gitlink text-center">
+				Link to GitHub Project:  <a href="https://github.com/{{ document['repo'] }}">https://github.com/{{ document['repo'] }}</a>
+			</p>
+		</div>
+		<div class="col-md-6">
+			<div class="d-flex flex-column">
+				<div class="col-md-6 align-self-center">
+					<p class="updates font-italic font-weight-light">
+						Last Updated: {{ moment(document['last_modified_utc']).format('llll') }}
+					</p>
+				</div>
+				<div class="col-md-6 align-self-center">
+					<p class="updates font-italic font-weight-light">
+						Last Sync: {{ moment(document['last_sync']).format('llll') }}
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+  <p>{{ document['body_html'] | safe }}</p>
+  {% endif %}
+</div>
+
+{% endblock %}
