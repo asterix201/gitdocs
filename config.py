@@ -23,3 +23,4 @@ class Config(object):
     MONGO_URI = os.environ.get('MONGO_URI')
     SCHEDULER_API_ENABLED = True
     LOGIN_DISABLED = False
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'

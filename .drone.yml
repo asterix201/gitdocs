@@ -6,7 +6,8 @@ trigger:
     - develop
     - master
   event:
-    - pull_request
+    # - pull_request
+    - push
 
 steps:
   - name: build_container
