@@ -1,0 +1,40 @@
+{% extends 'bootstrap4/bootstrap4.html' %}
+
+{% load bootstrap4 %}
+
+{% block bootstrap4_title %}Welcome to GitDocs{% endblock %}
+
+{% block bootstrap4_before_content %}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                        <a class="navbar-brand mb-0 h1" href="{% url 'index' %}">GitDocs</a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                          </button>
+                          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                            <div class="navbar-nav">
+                              <li class="nav-item active">
+                                <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
+                              </li>
+                            </div>
+                          </div>
+                          <ul class="nav navbar-nav navbar-right">
+                                <form class="form-inline">
+                                    <a href="#" class="btn btn-outline-success my-2 my-sm-0">Register Project</a>
+                                </form>
+                                <form class="form-inline ml-auto">
+                                  <a href="#" class="btn btn-outline-secondary">Logout</a>
+                                </form>
+                                <form class="form-inline ml-auto">
+                                  <a href="#" class="btn btn-outline-secondary">Log in</a>
+                                </form>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+        </div>
+{% endblock %}
